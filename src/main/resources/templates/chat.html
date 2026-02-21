@@ -43,8 +43,8 @@
         document.getElementById('sendMessage').disabled = !connected;
     }
     function connect() {
-        // Connect to the SockJS endpoint registered at /chat
-        var socket = new SockJS('/chat');
+        // Connect to the SockJS endpoint registered at /ws
+        var socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
         stompClient.connect({}, function (frame) {
             setConnected(true);
