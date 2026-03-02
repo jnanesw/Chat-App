@@ -16,7 +16,7 @@ public interface ConversationService {
 
     public ConversationResponse createConversation(ConversationRequest conversationRequest);
 
-    public ConversationResponse addParticipant(String userName, Long conversationid);
+    public ConversationResponse addParticipant(ConversationRequest conversationRequest, Long conversationid);
 
     public GroupCreateResponse createGroup(GroupCreateRequest groupCreateRequest);
 }

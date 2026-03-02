@@ -138,23 +138,36 @@ public class ConversationServiceImpl implements ConversationService{
     }
 
     @Override
-    public ConversationResponse addParticipant(String userName, Long conversationid) {
+    public ConversationResponse addParticipant(ConversationRequest conversationRequest, Long conversationid) {
         Conversation conversation = conversationRepo.findById(conversationid).orElseThrow(()->
                     new RuntimeException("No conversation is found in DB with id: " + conversationid)
                 );
 
-        User user = userRepo.findByUserName(userName);
+        User user = userRepo.findByUserName(conversationRequest.getOtherUserName());
+
+        if(user == null){
+            throw new RuntimeException("No user found in DB with name: " + conversationRequest.getOtherUserName());
+        }
+
+        conversation.getParticipants().stream().map((participant) -> {
+            if(participant.getId().equals(user.getId())){
+                throw new RuntimeException("User with id: "+ user.getId() + " Already exists in the conversation");
+            }
+
+            return participant;
+        });
+
         ConversationParticipant conversationParticipant = new ConversationParticipant();
         conversationParticipant.setConversation(conversation);
         conversationParticipant.setUser(user);
         conversationParticipant.setJoinedAt(System.currentTimeMillis());
 
-        participantRepo.save(conversationParticipant);
+        ConversationParticipant savedParticipant = participantRepo.save(conversationParticipant);
 
         ConversationResponse conversationResponse = new ConversationResponse();
-        conversationResponse.setId(conversation.getId());
-        conversationResponse.setConversationType(conversation.getConversationType());
-        conversationResponse.setCreatedAt(conversation.getCreatedAt());
+        conversationResponse.setId(savedParticipant.getConversation().getId());
+        conversationResponse.setConversationType(savedParticipant.getConversation().getConversationType());
+        conversationResponse.setCreatedAt(savedParticipant.getConversation().getCreatedAt());
 
         return conversationResponse;
     }

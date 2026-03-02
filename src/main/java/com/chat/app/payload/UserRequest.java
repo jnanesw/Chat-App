@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserRequest {
     private String username;
-    private String conversationType;
 
     public String getUsername() {
         return username;
@@ -17,13 +16,5 @@ public class UserRequest {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getConversationType() {
-        return conversationType;
-    }
-
-    public void setConversationType(String conversationType) {
-        this.conversationType = conversationType;
     }
 }
