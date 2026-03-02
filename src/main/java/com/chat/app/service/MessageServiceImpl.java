@@ -11,6 +11,7 @@ import com.chat.app.repository.ConversationRepository;
 import com.chat.app.repository.MessageRepository;
 import com.chat.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,6 +31,9 @@ public class MessageServiceImpl implements MessageService {
     @Autowired
     private ConversationRepository conversationRepo;
 
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
     @Override
     public MessageResponse saveMessage(MessageRequest messageRequest) {
         User user = userRepo.findById(messageRequest.getSenderId()).orElseThrow(()->
@@ -46,6 +50,9 @@ public class MessageServiceImpl implements MessageService {
         message.setCreatedAt(System.currentTimeMillis());
 
         Message savedMessage = messageRepo.save(message);
+
+        messagingTemplate.convertAndSend("/topic/conversations/"+savedMessage.getConversation().getId(),
+                savedMessage);
 
         MessageResponse messageResponse = new MessageResponse();
         messageResponse.setMessageId(savedMessage.getId());

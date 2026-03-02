@@ -24,11 +24,6 @@ public class MessageController {
         return messageService.saveMessage(messageRequest);
     }
 
-//    @GetMapping("/api/chatHistory")
-//    public List<ChatMessage> getChatHistory(){
-//        return chatService.getChatHistory();
-//    }
-
     @GetMapping("/chatHistory/{conversationid}/messages")
     @ResponseBody
     public List<Message> getMessages(@PathVariable Long conversationid){
