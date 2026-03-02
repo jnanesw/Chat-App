@@ -1,4 +1,4 @@
-# How to test the Chat App (two users)
+**# How to test the Chat App (two users)
 
 Use this deployed URL:
 https://chat-app-916297375578.europe-west1.run.app/chat
@@ -11,4 +11,4 @@ Steps:
 5. Confirm the message appears in Browser B as well.
 6. Reply from Browser B and confirm Browser A receives it.
 
-That's it — two browser windows = two members.
+That's it — two browser windows = two members.**
