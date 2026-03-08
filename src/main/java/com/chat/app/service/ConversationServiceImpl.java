@@ -38,19 +38,42 @@ public class ConversationServiceImpl implements ConversationService{
         User user = userRepo.findById(userid).orElseThrow(()-> new RuntimeException("User not found in DB!!"));
 
         List<Conversation> conversations = new ArrayList<>();
+		List<ConversationResponse> conversationResponses = new ArrayList<>();
+		
         List<ConversationParticipant> conversationParticipants = user.getParticipants();
         if (conversationParticipants.isEmpty()){
-            throw new RuntimeException("No conversations found for the user.");
+            System.out.println("No conversations found for the user.");
+			return conversationResponses;
         }
 
         for(ConversationParticipant cp: conversationParticipants){
             conversations.add(cp.getConversation());
         }
 
-        List<ConversationResponse> conversationResponses = conversations.stream().map((conversation -> {
+        conversationResponses = conversations.stream().map((conversation -> {
             ConversationResponse conversationResponse = new ConversationResponse();
             conversationResponse.setId(conversation.getId());
             conversationResponse.setConversationType(conversation.getConversationType());
+
+            if(conversation.getConversationType().equalsIgnoreCase("ONE_TO_ONE")){
+                System.out.println("Entered inside ONE_TO_ONE");
+                List<ConversationParticipant> participants = participantRepo.findByConversationId(conversation.getId());
+
+                User receiverUser = participants.stream()
+                        .map(ConversationParticipant::getUser)
+                        .filter( user1 -> !user1.getId().equals(userid))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalStateException("No other participant found"));
+
+                conversationResponse.setReceiverName(receiverUser.getUserName());
+            }
+            System.out.println("Exited inside ONE_TO_ONE: " + conversationResponse.getReceiverName());
+            if(conversation.getConversationType().equalsIgnoreCase("GROUP")){
+                System.out.println("Entered inside GROUP: " + conversation.getGroupName());
+                conversationResponse.setReceiverName(conversation.getGroupName());
+            }
+            System.out.println("Exited inside GROUP: " + conversationResponse.getReceiverName());
+
             conversationResponse.setCreatedAt(conversation.getCreatedAt());
             conversationResponse.setMessages(conversation.getMessages());
 
@@ -60,18 +83,11 @@ public class ConversationServiceImpl implements ConversationService{
         return conversationResponses;
     }
 
-//    @Override
-//    public List<Message> getMessages(Long conversationid){
-//        List<Message> messages = conversationRepo.findById(conversationid).get().getMessages();
-//
-//        if(messages.isEmpty()) throw new RuntimeException("Conversation with the " + conversationid + " is not present in DB!!");
-//
-//        return messages;
-//    }
-
     @Override
     public ConversationResponse createConversation(ConversationRequest conversationRequest) {
         User user = userRepo.findByUserName(conversationRequest.getOtherUserName());
+		System.out.println("Newly added UserName: " + conversationRequest.getOtherUserName());
+		System.out.println("Checked in DB: "+ user);
         if(user == null){
             throw new RuntimeException("User not found in DB!!");
         }
@@ -85,6 +101,7 @@ public class ConversationServiceImpl implements ConversationService{
         ConversationResponse conversationResponse = new ConversationResponse();
         conversationResponse.setId(savedConversation.getId());
         conversationResponse.setConversationType(savedConversation.getConversationType());
+        conversationResponse.setReceiverName(conversationRequest.getOtherUserName());
         conversationResponse.setCreatedAt(savedConversation.getCreatedAt());
 
         User currentUser = userRepo.findById(conversationRequest.getCurrentUserId()).orElseThrow(()->
@@ -109,32 +126,67 @@ public class ConversationServiceImpl implements ConversationService{
 
     @Override
     public GroupCreateResponse createGroup(GroupCreateRequest groupCreateRequest) {
-        Conversation conversation = new Conversation();
-        conversation.setConversationType("GROUP");
-        conversation.setCreatedAt(System.currentTimeMillis());
+        userRepo.findById(groupCreateRequest.getCurrentUserId()).orElseThrow(()->
+                    new RuntimeException("User with id: " + groupCreateRequest.getCurrentUserId() +
+                            " not found in DB")
+                );
 
-        Conversation savedConversation = conversationRepo.save(conversation);
-
+        GroupCreateResponse groupCreateResponse = new GroupCreateResponse();
         Long joinedAt = System.currentTimeMillis();
-        List<ConversationParticipant> participantList = groupCreateRequest.getParticipants().stream().map((participant) -> {
-            User user = userRepo.findById(participant).orElseThrow(()->
-                    new RuntimeException("User not found in DB with id: "+ participant));
+
+        if(groupCreateRequest.getConversationID() == null){
+            Conversation conversation = new Conversation();
+
+            conversation.setConversationType("GROUP");
+            conversation.setGroupName(groupCreateRequest.getGroupName());
+            conversation.setCreatedAt(System.currentTimeMillis());
+
+            Conversation savedConversation = conversationRepo.save(conversation);
+
+            List<ConversationParticipant> participantList = groupCreateRequest.getParticipants().stream().map((participant) -> {
+                User user = userRepo.findByUserName(participant);
+                if(user == null) throw new RuntimeException("User not found in DB with id: "+ participant);
+
+                ConversationParticipant newParticipant = new ConversationParticipant();
+                newParticipant.setConversation(savedConversation);
+                newParticipant.setUser(user);
+                newParticipant.setJoinedAt(joinedAt);
+
+                return newParticipant;
+            }).toList();
+            participantRepo.saveAll(participantList);
+
+            groupCreateResponse.setConversationId(conversation.getId());
+            groupCreateResponse.setGroupName((conversation.getGroupName()));
+            groupCreateResponse.setParticipants(groupCreateRequest.getParticipants());
+            groupCreateResponse.setConversationType(savedConversation.getConversationType());
+            groupCreateResponse.setCreatedAt(joinedAt);
+
+        }
+        if(groupCreateRequest.getConversationID() != null){
+            User user = userRepo.findByUserName(groupCreateRequest.getParticipants().get(0));
+            if(user == null){
+                throw new RuntimeException("No user found with username: " + groupCreateRequest.getParticipants().get(0));
+            }
+
+            Conversation conversation = conversationRepo.findById(groupCreateRequest.getConversationID())
+                    .orElseThrow(() -> new RuntimeException("No conversation with: " + groupCreateRequest.getConversationID() + " is found!"));
+
             ConversationParticipant newParticipant = new ConversationParticipant();
             newParticipant.setConversation(conversation);
             newParticipant.setUser(user);
             newParticipant.setJoinedAt(joinedAt);
+            participantRepo.save(newParticipant);
 
-            return newParticipant;
-        }).toList();
-        participantRepo.saveAll(participantList);
-
-        GroupCreateResponse groupCreateResponse = new GroupCreateResponse();
-        groupCreateResponse.setConversationId(conversation.getId());
-        groupCreateResponse.setParticipants(groupCreateRequest.getParticipants());
-        groupCreateResponse.setConversationType(savedConversation.getConversationType());
-        groupCreateResponse.setCreatedAt(System.currentTimeMillis());
+            groupCreateResponse.setConversationId(conversation.getId());
+            groupCreateResponse.setGroupName((conversation.getGroupName()));
+            groupCreateResponse.setParticipants(groupCreateRequest.getParticipants());
+            groupCreateResponse.setConversationType(conversation.getConversationType());
+            groupCreateResponse.setCreatedAt(joinedAt);
+        }
 
         return groupCreateResponse;
+
     }
 
     @Override

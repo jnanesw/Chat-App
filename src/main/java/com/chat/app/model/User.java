@@ -19,7 +19,7 @@ public class User {
     private String userName;
     private Long createdAt;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ConversationParticipant> participants;
 
     public Long getId() {

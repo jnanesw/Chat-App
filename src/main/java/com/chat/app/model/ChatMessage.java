@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// Mark as a JPA entity so it can be persisted by Spring Data JPA
+
 @Entity
 @Table(name = "chat_message")
 @Data

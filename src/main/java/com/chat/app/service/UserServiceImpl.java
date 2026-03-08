@@ -22,9 +22,12 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserResponse createUser(UserRequest userRequest) {
         User user = userRepo.findByUserName(userRequest.getUsername());
+		System.out.println("Username from existed user: " + user);
+		System.out.println("Username from UserRequest: " + userRequest.getUsername());
         if(user != null){
-            throw new RuntimeException("User Already exists in the DB");
+			return modelMapper.map(user, UserResponse.class);
         }
+		
         User user1 = new User();
         user1.setUserName(userRequest.getUsername());
         user1.setCreatedAt(System.currentTimeMillis());

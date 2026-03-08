@@ -1,12 +1,10 @@
 package com.chat.app.controller;
 
-import com.chat.app.model.Message;
 import com.chat.app.payload.ConversationRequest;
 import com.chat.app.payload.ConversationResponse;
 import com.chat.app.payload.GroupCreateRequest;
 import com.chat.app.payload.GroupCreateResponse;
 import com.chat.app.service.ConversationService;
-import com.chat.app.service.ConversationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

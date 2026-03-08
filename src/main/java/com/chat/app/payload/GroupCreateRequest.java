@@ -11,7 +11,9 @@ import java.util.List;
 @NoArgsConstructor
 public class GroupCreateRequest {
     private Long currentUserId;
-    private List<Long> participants;
+    private String groupName;
+    private List<String> participants;
+    private Long conversationID;
 
     public Long getCurrentUserId() {
         return currentUserId;
@@ -21,11 +23,27 @@ public class GroupCreateRequest {
         this.currentUserId = currentUserId;
     }
 
-    public List<Long> getParticipants() {
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public List<String> getParticipants() {
         return participants;
     }
 
-    public void setParticipants(List<Long> participants) {
+    public void setParticipants(List<String> participants) {
         this.participants = participants;
+    }
+
+    public Long getConversationID() {
+        return conversationID;
+    }
+
+    public void setConversationID(Long conversationID) {
+        this.conversationID = conversationID;
     }
 }

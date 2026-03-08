@@ -11,7 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 public class GroupCreateResponse {
     private Long conversationId;
-    private List<Long> participants;
+    private String groupName;
+    private List<String> participants;
     private String conversationType;
     private Long createdAt;
 
@@ -23,11 +24,19 @@ public class GroupCreateResponse {
         this.conversationId = conversationId;
     }
 
-    public List<Long> getParticipants() {
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public List<String> getParticipants() {
         return participants;
     }
 
-    public void setParticipants(List<Long> participants) {
+    public void setParticipants(List<String> participants) {
         this.participants = participants;
     }
 

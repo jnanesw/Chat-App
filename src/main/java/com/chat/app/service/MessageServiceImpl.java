@@ -46,6 +46,7 @@ public class MessageServiceImpl implements MessageService {
         Message message = new Message();
         message.setConversation(conversation);
         message.setSenderId(messageRequest.getSenderId());
+        message.setSender(user.getUserName());
         message.setContent(messageRequest.getContent());
         message.setCreatedAt(System.currentTimeMillis());
 

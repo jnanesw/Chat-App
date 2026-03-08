@@ -1,8 +1,6 @@
 package com.chat.app.payload;
 
-import com.chat.app.model.ConversationParticipant;
 import com.chat.app.model.Message;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +13,7 @@ import java.util.List;
 public class ConversationResponse {
     private Long id;
     private String conversationType;
+    private String receiverName;
     private Long createdAt;
     private List<Message> messages;
 
@@ -32,6 +31,14 @@ public class ConversationResponse {
 
     public void setConversationType(String conversationType) {
         this.conversationType = conversationType;
+    }
+
+    public String getReceiverName() {
+        return receiverName;
+    }
+
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
     }
 
     public Long getCreatedAt() {

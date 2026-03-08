@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -17,9 +21,11 @@ public class Message {
 
     @ManyToOne
     @JoinColumn(name = "conversation_id")
+	@JsonIgnore
     private Conversation conversation;
 
     private Long senderId;
+    private String sender;
     private String content;
     private Long createdAt;
 
@@ -45,6 +51,14 @@ public class Message {
 
     public void setSenderId(Long senderId) {
         this.senderId = senderId;
+    }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
     }
 
     public String getContent() {

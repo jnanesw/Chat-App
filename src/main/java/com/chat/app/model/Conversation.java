@@ -19,12 +19,14 @@ public class Conversation {
 
     private String conversationType;
 
+    private String groupName;
+
     private Long createdAt;
 
-    @OneToMany(mappedBy = "conversation")
+    @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConversationParticipant> participants;
 
-    @OneToMany(mappedBy = "conversation")
+    @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages;
 
     public Long getId() {
@@ -57,6 +59,14 @@ public class Conversation {
 
     public void setParticipants(List<ConversationParticipant> participants) {
         this.participants = participants;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     public List<Message> getMessages() {
