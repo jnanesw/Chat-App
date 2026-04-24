@@ -17,6 +17,8 @@ public class User {
     @Column(name = "user_id")
     private Long id;
     private String userName;
+    private Long phNo;
+    private String password;
     private Long createdAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -36,6 +38,22 @@ public class User {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Long getPhNo() {
+        return phNo;
+    }
+
+    public void setPhNo(Long phNo) {
+        this.phNo = phNo;
     }
 
     public Long getCreatedAt() {

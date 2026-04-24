@@ -6,9 +6,8 @@ import com.chat.app.payload.UserResponse;
 import com.chat.app.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -19,20 +18,28 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private PasswordEncoder encoder;
+
     @Override
     public UserResponse createUser(UserRequest userRequest) {
-        User user = userRepo.findByUserName(userRequest.getUsername());
+        User user = userRepo.findByPhNo(userRequest.getPhNo());
+
 		System.out.println("Username from existed user: " + user);
 		System.out.println("Username from UserRequest: " + userRequest.getUsername());
-        if(user != null){
-			return modelMapper.map(user, UserResponse.class);
-        }
-		
-        User user1 = new User();
-        user1.setUserName(userRequest.getUsername());
-        user1.setCreatedAt(System.currentTimeMillis());
-        userRepo.save(user1);
 
-        return modelMapper.map(user1, UserResponse.class);
+        if(userRepo.findByPhNo(userRequest.getPhNo()) != null){
+            return modelMapper.map(user, UserResponse.class);
+        }
+
+        User user1 = new User();
+        user.setUserName(userRequest.getUsername());
+        user.setPhNo(userRequest.getPhNo());
+        user.setPassword(encoder.encode(userRequest.getPassword()));
+        user.setCreatedAt(System.currentTimeMillis());
+
+        User savedUser = userRepo.save(user);
+
+        return modelMapper.map(savedUser, UserResponse.class);
     }
 }

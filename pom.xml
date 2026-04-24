@@ -87,10 +87,21 @@
 			<scope>compile</scope>
 		</dependency>
 
+<!--		<dependency>-->
+<!--			<groupId>com.google.cloud.sql</groupId>-->
+<!--			<artifactId>mysql-socket-factory-connector-j-8</artifactId>-->
+<!--			<version>1.13.1</version>-->
+<!--		</dependency>-->
+
 		<dependency>
-			<groupId>com.google.cloud.sql</groupId>
-			<artifactId>mysql-socket-factory-connector-j-8</artifactId>
-			<version>1.13.1</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
